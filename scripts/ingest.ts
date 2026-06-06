@@ -23,8 +23,11 @@ async function main() {
   const payload = buildUpsertPayload(rated, prime)
 
   const prisma = new PrismaClient()
-  await loadRatedSeasons(prisma, payload)
-  await prisma.$disconnect()
+  try {
+    await loadRatedSeasons(prisma, payload)
+  } finally {
+    await prisma.$disconnect()
+  }
 
   console.log(
     `Ingéré: ${payload.playerSeasons.length} joueur-saisons, ` +
