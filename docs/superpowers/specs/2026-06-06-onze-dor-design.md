@@ -248,3 +248,24 @@ vision ; le prochain plan portera sur les **Phases 0 et 1**.
 - Mercato/transferts réels en direct.
 - Autres championnats (archi extensible, mais hors périmètre initial).
 - Application native (la PWA couvre mobile + desktop).
+
+---
+
+## 12. Addendum (révision mécanique du draft — v2)
+
+Suite aux retours de jeu, la mécanique de draft évolue (Plans 7-9) :
+
+- **Choix de la formation** avant la partie (4-3-3, 4-2-3-1, 3-5-2, 4-4-2).
+- **Draft « une équipe par pick »** : à chaque poste à remplir, on tire au sort une
+  **équipe-saison** et on affiche **tout son effectif** ; on choisit un joueur éligible
+  pour ce poste. **3 rerolls par partie** (re-tirer l'équipe). Le XI final mélange
+  plusieurs clubs/années. (Remplace l'ancien « 3 joueurs de clubs différents ».)
+- **Sélection manuelle du poste** : on clique le slot de la formation à remplir.
+- **Verrou de poste** : chaque joueur a des **postes éligibles** (`eligiblePositions`) ;
+  on ne peut le placer que sur un slot compatible (ex. Neymar ≠ défenseur).
+- **Simulation animée** : la saison se déroule **journée par journée** avec le
+  **classement mis à jour en direct** (calendrier round-robin exposé par journées).
+
+Données nécessaires : **effectifs complets** par équipe-saison + **postes éligibles** par
+joueur. En attendant le scraping (Plan 2b), le pool d'exemple est étendu à de vrais
+effectifs complets. L'ancienne mécanique reste en place jusqu'à la bascule UI (Plan 9).
