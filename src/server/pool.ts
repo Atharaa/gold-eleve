@@ -6,9 +6,9 @@ import { samplePool } from '../data/samplePool'
 
 export type PoolMode = 'prime' | 'season'
 
-let client: PrismaClient | null = null
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 function db(): PrismaClient {
-  return (client ??= new PrismaClient())
+  return (globalForPrisma.prisma ??= new PrismaClient())
 }
 
 async function primeRows(): Promise<DbSeasonRow[]> {
@@ -51,5 +51,6 @@ async function seasonRows(): Promise<DbSeasonRow[]> {
 export async function getPool(mode: PoolMode): Promise<PoolPlayer[]> {
   if (!process.env.DATABASE_URL) return samplePool
   const rows = mode === 'prime' ? await primeRows() : await seasonRows()
-  return rowsToPool(rows)
+  const pool = rowsToPool(rows)
+  return pool.length > 0 ? pool : samplePool
 }
