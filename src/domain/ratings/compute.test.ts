@@ -26,6 +26,14 @@ describe('computeSeasonRatings (rich)', () => {
   it('returns empty for empty cohort', () => { expect(computeSeasonRatings([], 'rich')).toEqual([]) })
 })
 
+it('throws when the cohort mixes position groups', () => {
+  const mixed: PlayerSeasonStats[] = [
+    { playerId: 'a', seasonId: '2020-21', position: 'ST', minutes: 1000, matches: 10, goals: 5, assists: 1 },
+    { playerId: 'b', seasonId: '2020-21', position: 'GK', minutes: 1000, matches: 10, goals: 0, assists: 0 },
+  ]
+  expect(() => computeSeasonRatings(mixed, 'rich')).toThrow()
+})
+
 describe('computeSeasonRatings (basic)', () => {
   const basicCohort: PlayerSeasonStats[] = [
     { playerId: 'expensive', seasonId: '2005-06', position: 'ST', minutes: 3000, matches: 34, goals: 20, assists: 6, marketValue: 40_000_000 },

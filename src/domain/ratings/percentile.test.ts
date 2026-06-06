@@ -18,4 +18,7 @@ describe('toPercentiles', () => {
     expect(result[1]).toBe(0)
     expect(result[2]).toBe(1)
   })
+  it('returns 0.5 for all when there is no variance', () => {
+    expect(toPercentiles([5, 5, 5])).toEqual([0.5, 0.5, 0.5])
+  })
 })

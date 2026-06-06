@@ -6,5 +6,5 @@ export function reliabilityFor(row: PlayerSeasonStats, tier: Tier): 1 | 2 | 3 | 
     const present = advanced.filter((v) => v !== undefined && v !== null).length
     return present >= 4 ? 4 : 3
   }
-  return row.marketValue ? 2 : 1
+  return row.marketValue != null ? 2 : 1
 }

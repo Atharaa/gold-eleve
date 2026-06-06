@@ -2,7 +2,7 @@ import { Metric } from './weights'
 import { PlayerSeasonStats } from './types'
 
 function per90(value: number | undefined, minutes: number): number {
-  if (!value || minutes <= 0) return 0
+  if (value == null || minutes <= 0) return 0
   return (value * 90) / minutes
 }
 

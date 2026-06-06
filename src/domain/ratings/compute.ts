@@ -12,6 +12,11 @@ export function computeSeasonRatings(cohort: PlayerSeasonStats[], tier: Tier): R
   if (cohort.length === 0) return []
 
   const group = toPositionGroup(cohort[0].position)
+  for (const row of cohort) {
+    if (toPositionGroup(row.position) !== group) {
+      throw new Error('computeSeasonRatings: cohort mixes position groups')
+    }
+  }
   const weights = tier === 'rich' ? RICH_WEIGHTS[group] : BASIC_WEIGHTS[group]
   const metrics = Object.keys(weights) as Metric[]
 
