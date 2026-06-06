@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { oneClubPerTeam, budgetCap } from './constraints'
+import { oneClubPerTeam, budgetCap, maxPlayerRating } from './constraints'
 import { PoolPlayer } from './types'
 
 function player(id: string, club: string, marketValue?: number): PoolPlayer {
@@ -28,5 +28,15 @@ describe('budgetCap', () => {
   })
   it('treats a missing market value as 0', () => {
     expect(cap.allows(player('a', 'PSG'), [player('b', 'Lyon', 50)])).toBe(true)
+  })
+})
+
+describe('maxPlayerRating', () => {
+  it('allows a candidate at or below the cap', () => {
+    expect(maxPlayerRating(85).allows({ ...player('a', 'PSG'), rating: 85 }, [])).toBe(true)
+    expect(maxPlayerRating(85).allows({ ...player('a', 'PSG'), rating: 80 }, [])).toBe(true)
+  })
+  it('blocks a candidate above the cap', () => {
+    expect(maxPlayerRating(85).allows({ ...player('a', 'PSG'), rating: 90 }, [])).toBe(false)
   })
 })

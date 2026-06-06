@@ -19,3 +19,10 @@ export function budgetCap(maxTotal: number): Constraint {
     },
   }
 }
+
+export function maxPlayerRating(cap: number): Constraint {
+  return {
+    name: `max-rating-${cap}`,
+    allows: (candidate) => candidate.rating <= cap,
+  }
+}

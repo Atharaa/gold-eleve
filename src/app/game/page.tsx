@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { PoolPlayer, teamRating } from '@/domain/game'
 import { initDraft, draftReducer, currentGroup, simulateFromPicks } from '@/domain/play'
+import { getChallenge, evaluateChallenge, Challenge } from '@/domain/challenges'
 import { PlayerCard } from '@/components/PlayerCard'
 import { FormationProgress } from '@/components/FormationProgress'
 import { StandingsTable } from '@/components/StandingsTable'
@@ -31,6 +32,7 @@ export default function GamePage() {
 function GameLoader() {
   const params = useSearchParams()
   const mode = params.get('mode') === 'season' ? 'season' : 'prime'
+  const challenge = getChallenge(params.get('challenge') ?? 'libre')
   const [pool, setPool] = useState<PoolPlayer[] | null>(null)
   const [round, setRound] = useState(0)
   const [baseSeed] = useState(() => Date.now() % 1_000_000)
@@ -62,11 +64,21 @@ function GameLoader() {
     )
   }
 
-  return <Game key={round} pool={pool} seed={baseSeed + round} onReplay={() => setRound((r) => r + 1)} />
+  return (
+    <Game
+      key={round}
+      pool={pool}
+      challenge={challenge}
+      seed={baseSeed + round}
+      onReplay={() => setRound((r) => r + 1)}
+    />
+  )
 }
 
-function Game({ pool, seed, onReplay }: { pool: PoolPlayer[]; seed: number; onReplay: () => void }) {
-  const [state, dispatch] = useReducer(draftReducer, undefined, () => initDraft(pool, FORMATION, seed))
+function Game({ pool, challenge, seed, onReplay }: { pool: PoolPlayer[]; challenge: Challenge; seed: number; onReplay: () => void }) {
+  const [state, dispatch] = useReducer(draftReducer, undefined, () =>
+    initDraft(pool, FORMATION, seed, challenge.constraints),
+  )
 
   if (state.phase === 'drafting') {
     return (
@@ -74,11 +86,19 @@ function Game({ pool, seed, onReplay }: { pool: PoolPlayer[]; seed: number; onRe
         <h1 className="title" style={{ fontSize: 18 }}>
           ONZE D&apos;OR
         </h1>
+        <p className="subtitle txt-gold" style={{ fontWeight: 700 }}>
+          {challenge.name}
+        </p>
         <div style={{ margin: '12px 0' }}>
           <FormationProgress total={state.formation.length} done={state.picked.length} group={currentGroup(state)} />
         </div>
         {state.candidates.length === 0 ? (
-          <p className="subtitle">Plus de candidats disponibles pour ce poste.</p>
+          <>
+            <p className="subtitle">Plus de candidats disponibles pour ce poste avec ce défi.</p>
+            <Link className="btn" href="/">
+              Changer de défi
+            </Link>
+          </>
         ) : (
           state.candidates.map((c) => (
             <PlayerCard key={c.playerId} player={c} onPick={() => dispatch({ type: 'PICK', player: c })} />
@@ -88,17 +108,21 @@ function Game({ pool, seed, onReplay }: { pool: PoolPlayer[]; seed: number; onRe
     )
   }
 
-  return <End picked={state.picked} seed={seed} onReplay={onReplay} />
+  return <End picked={state.picked} challenge={challenge} seed={seed} onReplay={onReplay} />
 }
 
-function End({ picked, seed, onReplay }: { picked: PoolPlayer[]; seed: number; onReplay: () => void }) {
+function End({ picked, challenge, seed, onReplay }: { picked: PoolPlayer[]; challenge: Challenge; seed: number; onReplay: () => void }) {
   const result = useMemo(() => simulateFromPicks(picked, { seed, teamName: 'Mon XI' }), [picked, seed])
   const rating = teamRating(picked)
+  const evaluation = useMemo(
+    () => evaluateChallenge(challenge, { picked, result, teamRating: rating }),
+    [challenge, picked, result, rating],
+  )
   const u = result.userRow
 
   return (
     <main className="wrap">
-      <p className="subtitle">TON ONZE D&apos;OR</p>
+      <p className="subtitle">TON ONZE D&apos;OR · {challenge.name.toUpperCase()}</p>
       <div style={{ textAlign: 'center', margin: '6px 0 12px' }}>
         <div className="rating" style={{ fontSize: 42 }}>
           {rating}
@@ -119,6 +143,26 @@ function End({ picked, seed, onReplay }: { picked: PoolPlayer[]; seed: number; o
         </div>
       </div>
 
+      <div className="panel-gold" style={{ marginBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: 13 }}>
+          <span>Objectifs</span>
+          <span className="txt-gold">
+            {evaluation.totalPoints} / {evaluation.maxPoints} pts
+          </span>
+        </div>
+        {evaluation.objectives.map((o) => (
+          <div key={o.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, padding: '4px 0' }}>
+            <span className={o.completed ? 'txt-green' : 'muted'}>
+              {o.completed ? '✓ ' : '○ '}
+              {o.label}
+            </span>
+            <span className={o.completed ? 'txt-gold' : 'muted'} style={{ fontWeight: 700 }}>
+              +{o.points}
+            </span>
+          </div>
+        ))}
+      </div>
+
       <div className="panel" style={{ marginBottom: 10 }}>
         <div style={{ fontWeight: 800, fontSize: 12, marginBottom: 6 }}>Classement</div>
         <StandingsTable table={result.table} />
@@ -127,14 +171,6 @@ function End({ picked, seed, onReplay }: { picked: PoolPlayer[]; seed: number; o
       <RankingList title="Meilleurs buteurs" rows={result.scorers} unit="buts" />
       <RankingList title="Meilleurs passeurs" rows={result.assisters} unit="passes" />
       <RankingList title="Meilleurs gardiens" rows={result.keepers} unit="clean sheets" />
-
-      <div className="panel" style={{ marginBottom: 10 }}>
-        <div style={{ fontWeight: 800, fontSize: 12 }}>Meilleure note du championnat</div>
-        <div className={result.bestRated.isUser ? 'txt-gold' : ''} style={{ fontSize: 12, marginTop: 4 }}>
-          {result.bestRated.isUser ? '★ ' : ''}
-          {result.bestRated.playerName} <span className="muted">{result.bestRated.club}</span> — {result.bestRated.value}
-        </div>
-      </div>
 
       <button className="btn btn-gold" onClick={onReplay} style={{ marginBottom: 8 }}>
         ↻ Rejouer

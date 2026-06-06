@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ModeToggle, Mode } from '@/components/ModeToggle'
+import { ChallengePicker } from '@/components/ChallengePicker'
 
 export default function Home() {
   const [mode, setMode] = useState<Mode>('prime')
+  const [challenge, setChallenge] = useState('libre')
   const router = useRouter()
 
   return (
@@ -16,11 +18,20 @@ export default function Home() {
       <div style={{ margin: '18px 0 6px' }}>
         <ModeToggle mode={mode} onChange={setMode} />
       </div>
-      <p className="subtitle" style={{ marginBottom: 18 }}>
+      <p className="subtitle" style={{ marginBottom: 16 }}>
         {mode === 'prime' ? 'Prime = meilleure saison de chaque joueur' : 'Saison = note de la saison de la carte'}
       </p>
 
-      <button className="btn btn-gold" onClick={() => router.push(`/game?mode=${mode}`)}>
+      <div className="muted" style={{ textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
+        Choisis ton défi
+      </div>
+      <ChallengePicker value={challenge} onChange={setChallenge} />
+
+      <button
+        className="btn btn-gold"
+        style={{ marginTop: 8 }}
+        onClick={() => router.push(`/game?mode=${mode}&challenge=${challenge}`)}
+      >
         ▶ NOUVELLE PARTIE
       </button>
     </main>
