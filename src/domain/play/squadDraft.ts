@@ -45,24 +45,16 @@ export function pickedPlayers(state: SquadDraftState): PoolPlayer[] {
   return state.slots.filter((s): s is PoolPlayer => s !== null)
 }
 
-// Slots vides que ce joueur peut occuper (groupe compatible, non encore sélectionné).
 export function eligibleSlots(state: SquadDraftState, player: PoolPlayer): number[] {
-  const groups = eligibleGroups(player)
-  const alreadyPicked = pickedPlayers(state).some((p) => p.playerId === player.playerId)
-  if (alreadyPicked) return []
-  const out: number[] = []
-  state.slots.forEach((slot, index) => {
-    if (slot === null && groups.includes(state.formation[index])) out.push(index)
-  })
-  return out
+  return state.slots.map((_, index) => index).filter((index) => canPick(state, index, player))
 }
 
 function canPick(state: SquadDraftState, slotIndex: number, player: PoolPlayer): boolean {
   if (state.slots[slotIndex] !== null) return false
   if (!state.currentSquad.players.some((p) => p.playerId === player.playerId)) return false
   if (!eligibleGroups(player).includes(state.formation[slotIndex])) return false
-  if (pickedPlayers(state).some((p) => p.playerId === player.playerId)) return false
   const picked = pickedPlayers(state)
+  if (picked.some((p) => p.playerId === player.playerId || p.playerName === player.playerName)) return false
   return state.constraints.every((c) => c.allows(player, picked))
 }
 
@@ -70,7 +62,7 @@ export function squadDraftReducer(state: SquadDraftState, action: SquadDraftActi
   if (state.phase === 'done') return state
 
   if (action.type === 'REROLL') {
-    if (state.rerollsLeft <= 0) return state
+    if (state.rerollsLeft <= 0 || state.squads.length <= 1) return state
     const drawCount = state.drawCount + 1
     return {
       ...state,
@@ -90,5 +82,5 @@ export function squadDraftReducer(state: SquadDraftState, action: SquadDraftActi
     return { ...state, slots, phase: 'done' }
   }
   const drawCount = state.drawCount + 1
-  return { ...state, slots, currentSquad: nextSquad(state.squads, state.seed, drawCount), drawCount }
+  return { ...state, slots, currentSquad: nextSquad(state.squads, state.seed, drawCount, state.currentSquad), drawCount }
 }
