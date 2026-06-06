@@ -35,4 +35,7 @@ describe('simulateSeason', () => {
     const weak = simulateSeason(makeTeam(50), { seed: 50, teamName: 'User' })
     expect(strong.userRow.points).toBeGreaterThan(weak.userRow.points)
   })
+  it('throws on an empty team', () => {
+    expect(() => simulateSeason([], { seed: 1 })).toThrow()
+  })
 })

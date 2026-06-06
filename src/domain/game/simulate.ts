@@ -12,6 +12,7 @@ export interface SimulateOptions {
 }
 
 export function simulateSeason(team: PoolPlayer[], options: SimulateOptions): SeasonResult {
+  if (team.length === 0) throw new Error('simulateSeason: team must not be empty')
   const rng = createRng(options.seed)
   const opponentCount = options.opponents ?? 17
   const teamName = options.teamName ?? 'Ton équipe'

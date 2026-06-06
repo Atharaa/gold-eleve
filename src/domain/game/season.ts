@@ -46,7 +46,7 @@ export function playSeason(rng: () => number, teams: TeamSeed[]): TableRow[] {
 }
 
 export function buildTable(rows: TableRow[]): TableRow[] {
-  const sorted = [...rows].sort(
+  const sorted = rows.map((row) => ({ ...row })).sort(
     (a, b) =>
       b.points - a.points ||
       b.gf - b.ga - (a.gf - a.ga) ||
