@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Club {
+  id            String         @id @default(cuid())
+  name          String
+  playerSeasons PlayerSeason[]
+}
+
+model Player {
+  id            String         @id @default(cuid())
+  name          String
+  primeSeasonId String?
+  seasons       PlayerSeason[]
+}
+
+model PlayerSeason {
+  id          String @id @default(cuid())
+  player      Player @relation(fields: [playerId], references: [id])
+  playerId    String
+  club        Club   @relation(fields: [clubId], references: [id])
+  clubId      String
+  season      String
+  competition String
+  position    String
+  tier        String
+
+  minutes Int
+  matches Int
+  goals   Int
+  assists Int
+
+  xG                   Float?
+  xA                   Float?
+  tacklesInterceptions Float?
+  progressivePasses    Float?
+  passCompletionPct    Float?
+  savePct              Float?
+  cleanSheets          Int?
+  goalsConcededPer90   Float?
+  marketValue          Int?
+
+  ratingComputed Int
+  ratingOverride Int?
+  reliability    Int
+
+  @@unique([playerId, season, competition])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  deviceId  String?  @unique
+  role      String   @default("player")
+  createdAt DateTime @default(now())
+}
