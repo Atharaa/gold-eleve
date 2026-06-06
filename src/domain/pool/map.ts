@@ -14,6 +14,7 @@ export function rowToPoolPlayer(row: DbSeasonRow): PoolPlayer {
     season: row.season,
     competition: row.competition,
     positionGroup: toPositionGroup(row.position),
+    eligiblePositions: [toPositionGroup(row.position)],
     rating: row.ratingOverride ?? row.ratingComputed,
     reliability: clampReliability(row.reliability),
     marketValue: row.marketValue ?? undefined,
