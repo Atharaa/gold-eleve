@@ -8,23 +8,25 @@ datasource db {
 
 model Club {
   id            String         @id @default(cuid())
-  name          String
+  name          String         @unique
   playerSeasons PlayerSeason[]
 }
 
 model Player {
   id            String         @id @default(cuid())
-  name          String
-  primeSeasonId String?
-  seasons       PlayerSeason[]
+  name          String         @unique
+  primeSeasonId String?        @unique
+  primeSeason   PlayerSeason?  @relation("PrimeSeason", fields: [primeSeasonId], references: [id])
+  seasons       PlayerSeason[] @relation("PlayerSeasons")
 }
 
 model PlayerSeason {
   id          String @id @default(cuid())
-  player      Player @relation(fields: [playerId], references: [id])
+  player      Player @relation("PlayerSeasons", fields: [playerId], references: [id])
   playerId    String
   club        Club   @relation(fields: [clubId], references: [id])
   clubId      String
+  primeOf     Player? @relation("PrimeSeason")
   season      String
   competition String
   position    String

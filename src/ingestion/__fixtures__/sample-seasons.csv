@@ -1,0 +1,6 @@
+player,club,season,competition,position,minutes,matches,goals,assists,xg,xa,tackles_interceptions,progressive_passes,pass_completion_pct,save_pct,clean_sheets,goals_conceded_per90,market_value
+Kylian Mbappe,PSG,2018-19,L1,ST,2700,29,33,7,28,6,12,80,82,,,,180000000
+Wissam Ben Yedder,Toulouse,2018-19,L1,ST,2900,38,21,5,19,4,15,75,79,,,,40000000
+Florian Thauvin,Marseille,2018-19,L1,RW,3000,38,16,8,14,9,20,140,81,,,,45000000
+Pape Souare,Lille,2014-15,L2,LB,2500,30,1,3,,,,,,,,,3000000
+Sloppy Sub,Niceville,2018-19,L1,ST,500,12,1,0,1,0,3,20,70,,,,2000000
