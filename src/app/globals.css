@@ -1,26 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --gold: #f5c451;
+  --bg: #0b1020;
+  --panel: #101830;
+  --panel-2: #1c2747;
+  --line: rgba(255, 255, 255, 0.09);
+  --muted: #9aa3b8;
+  --green: #6ee7a0;
+  --red: #f87171;
+  --amber: #fbbf24;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: #fff;
+  font-family: system-ui, -apple-system, sans-serif;
 }
+
+.wrap { max-width: 540px; margin: 0 auto; padding: 16px 16px 48px; }
+.title { text-align: center; font-weight: 900; letter-spacing: 2px; color: var(--gold); font-size: 24px; margin: 8px 0 2px; }
+.subtitle { text-align: center; color: var(--muted); font-size: 12px; margin: 2px 0; }
+.muted { color: var(--muted); font-size: 11px; }
+
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.panel-gold { background: linear-gradient(160deg, var(--panel-2), var(--panel)); border: 1px solid rgba(245, 196, 81, 0.33); border-radius: 12px; padding: 12px; }
+
+.btn { display: block; width: 100%; text-align: center; padding: 14px; border-radius: 11px; font-weight: 800; border: 1px solid var(--line); background: var(--panel); color: #fff; cursor: pointer; font-size: 15px; text-decoration: none; }
+.btn-gold { background: var(--gold); color: var(--bg); border: none; }
+
+.toggle { display: flex; background: var(--panel-2); border-radius: 10px; padding: 4px; }
+.toggle button { flex: 1; padding: 8px; border: none; border-radius: 7px; background: transparent; color: var(--muted); font-weight: 700; cursor: pointer; font-size: 13px; }
+.toggle button.active { background: var(--gold); color: var(--bg); font-weight: 800; }
+
+.card { display: flex; justify-content: space-between; align-items: center; width: 100%; text-align: left; cursor: pointer; margin-bottom: 8px; }
+.rating { font-size: 26px; font-weight: 900; color: var(--gold); line-height: 1; }
+
+table.tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+table.tbl th { color: var(--muted); font-size: 9px; text-align: left; padding: 2px; }
+table.tbl td { padding: 5px 2px; border-top: 1px solid var(--line); }
+.row-user { background: rgba(245, 196, 81, 0.13); }
+
+.txt-gold { color: var(--gold); }
+.txt-green { color: var(--green); }
+.txt-red { color: var(--red); }
+.txt-amber { color: var(--amber); }
