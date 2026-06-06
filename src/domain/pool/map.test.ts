@@ -26,6 +26,9 @@ describe('rowToPoolPlayer', () => {
     expect(rowToPoolPlayer({ ...base, reliability: 9 }).reliability).toBe(4)
     expect(rowToPoolPlayer({ ...base, reliability: 0 }).reliability).toBe(1)
   })
+  it('sets eligiblePositions to the mapped position group by default', () => {
+    expect(rowToPoolPlayer(base).eligiblePositions).toEqual(['ATT'])
+  })
 })
 
 describe('rowsToPool', () => {

@@ -7,6 +7,8 @@ export interface PoolPlayer {
   season: string
   competition: string
   positionGroup: PositionGroup
+  /** Groupes de postes que le joueur peut occuper. Défaut implicite : [positionGroup]. */
+  eligiblePositions?: PositionGroup[]
   rating: number
   reliability: 1 | 2 | 3 | 4
   marketValue?: number
