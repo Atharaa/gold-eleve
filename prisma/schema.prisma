@@ -8,13 +8,13 @@ datasource db {
 
 model Club {
   id            String         @id @default(cuid())
-  name          String
+  name          String         @unique
   playerSeasons PlayerSeason[]
 }
 
 model Player {
   id            String         @id @default(cuid())
-  name          String
+  name          String         @unique
   primeSeasonId String?
   seasons       PlayerSeason[]
 }
