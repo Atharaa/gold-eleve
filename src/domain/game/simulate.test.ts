@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { simulateSeason } from './simulate'
+import { standingsAfter } from './season'
 import { PoolPlayer } from './types'
 
 function makeTeam(rating: number): PoolPlayer[] {
@@ -44,5 +45,11 @@ describe('simulateSeason', () => {
     // le classement après la dernière journée doit correspondre au tableau final
     const last = result.matchdays[result.matchdays.length - 1].round
     expect(last).toBe(34)
+  })
+  it('the final table equals the standings after the last matchday', () => {
+    const seeds = result.table.map((r) => ({ name: r.name, strength: 0, isUser: r.isUser }))
+    const final = standingsAfter(result.matchdays, seeds, 34)
+    expect(final.map((r) => r.name)).toEqual(result.table.map((r) => r.name))
+    expect(final.map((r) => r.points)).toEqual(result.table.map((r) => r.points))
   })
 })

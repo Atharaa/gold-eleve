@@ -5,6 +5,20 @@ import { playSeasonByMatchday, accumulateStandings, buildTable, TeamSeed } from 
 import { assembleScorers, assembleAssisters, assembleKeepers, assembleBestRated } from './rankings'
 import { PoolPlayer, SeasonResult } from './types'
 
+function ensureUniqueNames(seeds: TeamSeed[]): TeamSeed[] {
+  const seen = new Set<string>()
+  return seeds.map((seed) => {
+    let name = seed.name
+    let suffix = 2
+    while (seen.has(name)) {
+      name = `${seed.name} (${suffix})`
+      suffix++
+    }
+    seen.add(name)
+    return { ...seed, name }
+  })
+}
+
 export interface SimulateOptions {
   seed: number
   teamName?: string
@@ -18,10 +32,10 @@ export function simulateSeason(team: PoolPlayer[], options: SimulateOptions): Se
   const teamName = options.teamName ?? 'Ton équipe'
 
   const opponents = generateOpponents(rng, opponentCount)
-  const seeds: TeamSeed[] = [
+  const seeds = ensureUniqueNames([
     { name: teamName, strength: teamRating(team), isUser: true },
     ...opponents.map((o) => ({ name: o.name, strength: o.strength, isUser: false })),
-  ]
+  ])
 
   const matchdays = playSeasonByMatchday(rng, seeds)
   const table = buildTable(accumulateStandings(matchdays, seeds))
