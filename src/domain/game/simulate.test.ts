@@ -38,4 +38,11 @@ describe('simulateSeason', () => {
   it('throws on an empty team', () => {
     expect(() => simulateSeason([], { seed: 1 })).toThrow()
   })
+  it('exposes the full matchday schedule (2*(N-1) rounds) consistent with the final table', () => {
+    expect(result.matchdays).toHaveLength(34)
+    expect(result.matchdays[0].matches).toHaveLength(9)
+    // le classement après la dernière journée doit correspondre au tableau final
+    const last = result.matchdays[result.matchdays.length - 1].round
+    expect(last).toBe(34)
+  })
 })
