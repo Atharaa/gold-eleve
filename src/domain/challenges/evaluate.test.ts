@@ -15,6 +15,7 @@ function ctx(invinc: boolean, position: number): EvalContext {
   const result: SeasonResult = {
     table: [u], userRow: u, invincible: invinc,
     scorers: [rank()], assisters: [rank()], keepers: [rank()], bestRated: rank(),
+    matchdays: [],
   }
   return { picked: [], result, teamRating: 88 }
 }

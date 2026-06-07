@@ -1,9 +1,23 @@
 import { createRng } from './rng'
 import { teamRating } from './draft'
 import { generateOpponents } from './match'
-import { playSeason, buildTable, TeamSeed } from './season'
+import { playSeasonByMatchday, accumulateStandings, buildTable, TeamSeed } from './season'
 import { assembleScorers, assembleAssisters, assembleKeepers, assembleBestRated } from './rankings'
 import { PoolPlayer, SeasonResult } from './types'
+
+function ensureUniqueNames(seeds: TeamSeed[]): TeamSeed[] {
+  const seen = new Set<string>()
+  return seeds.map((seed) => {
+    let name = seed.name
+    let suffix = 2
+    while (seen.has(name)) {
+      name = `${seed.name} (${suffix})`
+      suffix++
+    }
+    seen.add(name)
+    return { ...seed, name }
+  })
+}
 
 export interface SimulateOptions {
   seed: number
@@ -18,12 +32,13 @@ export function simulateSeason(team: PoolPlayer[], options: SimulateOptions): Se
   const teamName = options.teamName ?? 'Ton équipe'
 
   const opponents = generateOpponents(rng, opponentCount)
-  const seeds: TeamSeed[] = [
+  const seeds = ensureUniqueNames([
     { name: teamName, strength: teamRating(team), isUser: true },
     ...opponents.map((o) => ({ name: o.name, strength: o.strength, isUser: false })),
-  ]
+  ])
 
-  const table = buildTable(playSeason(rng, seeds))
+  const matchdays = playSeasonByMatchday(rng, seeds)
+  const table = buildTable(accumulateStandings(matchdays, seeds))
   const userRow = table.find((r) => r.isUser)!
   const opponentRows = table.filter((r) => !r.isUser)
 
@@ -35,5 +50,6 @@ export function simulateSeason(team: PoolPlayer[], options: SimulateOptions): Se
     assisters: assembleAssisters(rng, team, userRow, opponentRows),
     keepers: assembleKeepers(team, userRow, opponentRows),
     bestRated: assembleBestRated(team, userRow, opponents),
+    matchdays,
   }
 }

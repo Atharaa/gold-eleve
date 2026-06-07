@@ -1,5 +1,6 @@
 import { simulateMatch } from './match'
-import { TableRow } from './types'
+import { Match, Matchday, TableRow } from './types'
+import { roundRobinSchedule } from './schedule'
 
 export interface TeamSeed {
   name: string
@@ -27,22 +28,37 @@ function applyResult(row: TableRow, scored: number, conceded: number): void {
   }
 }
 
-// Double round-robin. Chaque paire ordonnée (i, j), i != j, est une rencontre
-// distincte (i à domicile) ; la rencontre retour est l'itération (j, i). À chaque
-// rencontre on met à jour les DEUX équipes (domicile ET extérieur), sinon les
-// stats à l'extérieur ne seraient jamais comptées (played = N-1 au lieu de 2*(N-1),
-// et gf != ga sur l'ensemble du championnat).
-export function playSeason(rng: () => number, teams: TeamSeed[]): TableRow[] {
+export function playSeasonByMatchday(rng: () => number, teams: TeamSeed[]): Matchday[] {
+  const schedule = roundRobinSchedule(teams.length)
+  return schedule.map((pairs, index) => ({
+    round: index + 1,
+    matches: pairs.map(([h, a]): Match => {
+      const [homeGoals, awayGoals] = simulateMatch(rng, teams[h].strength, teams[a].strength)
+      return { home: teams[h].name, away: teams[a].name, homeGoals, awayGoals }
+    }),
+  }))
+}
+
+export function accumulateStandings(matchdays: Matchday[], teams: TeamSeed[]): TableRow[] {
   const rows = teams.map(emptyRow)
-  for (let i = 0; i < teams.length; i++) {
-    for (let j = 0; j < teams.length; j++) {
-      if (i === j) continue
-      const [goalsHome, goalsAway] = simulateMatch(rng, teams[i].strength, teams[j].strength)
-      applyResult(rows[i], goalsHome, goalsAway)
-      applyResult(rows[j], goalsAway, goalsHome)
+  const byName = new Map(rows.map((r) => [r.name, r]))
+  for (const md of matchdays) {
+    for (const m of md.matches) {
+      const home = byName.get(m.home)
+      const away = byName.get(m.away)
+      if (home) applyResult(home, m.homeGoals, m.awayGoals)
+      if (away) applyResult(away, m.awayGoals, m.homeGoals)
     }
   }
   return rows
+}
+
+export function standingsAfter(matchdays: Matchday[], teams: TeamSeed[], uptoRound: number): TableRow[] {
+  return buildTable(accumulateStandings(matchdays.filter((m) => m.round <= uptoRound), teams))
+}
+
+export function playSeason(rng: () => number, teams: TeamSeed[]): TableRow[] {
+  return accumulateStandings(playSeasonByMatchday(rng, teams), teams)
 }
 
 export function buildTable(rows: TableRow[]): TableRow[] {
