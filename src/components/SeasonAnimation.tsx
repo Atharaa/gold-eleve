@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { SeasonResult, standingsAfter } from '@/domain/game'
 import { StandingsTable } from './StandingsTable'
 
 export function SeasonAnimation({ result, onFinish }: { result: SeasonResult; onFinish: () => void }) {
   const totalRounds = result.matchdays.length
-  const teams = result.table.map((r) => ({ name: r.name, strength: 0, isUser: r.isUser }))
-  const [round, setRound] = useState(0)
+  const teams = useMemo(() => result.table.map((r) => ({ name: r.name, strength: 0, isUser: r.isUser })), [result])
+  const [round, setRound] = useState(1)
 
   useEffect(() => {
     if (round >= totalRounds) return

@@ -92,6 +92,8 @@ function Game({ pool, formation, challenge, seed, onReplay }: { pool: PoolPlayer
       setSelectedSlot(null)
     }
 
+    const squadHasPlayable = state.currentSquad.players.some((p) => eligibleSlots(state, p).length > 0)
+
     return (
       <main className="wrap">
         <h1 className="title" style={{ fontSize: 18 }}>ONZE D&apos;OR</h1>
@@ -101,7 +103,21 @@ function Game({ pool, formation, challenge, seed, onReplay }: { pool: PoolPlayer
           {selectedSlot === null ? 'choisis un poste ou un joueur' : 'choisis un joueur pour ce poste'}
         </p>
 
-        <Pitch formation={state.formation} slots={state.slots} selectedSlot={selectedSlot} onSelectSlot={(i) => setSelectedSlot((s) => (s === i ? null : i))} />
+        <Pitch formation={state.formation} slots={state.slots} selectedSlot={selectedSlot} onSelectSlot={(i) => {
+          if (state.slots[i] !== null) return
+          setSelectedSlot((s) => (s === i ? null : i))
+        }} />
+
+        {!squadHasPlayable && (
+          <div className="panel" style={{ marginTop: 12 }}>
+            <p className="subtitle" style={{ margin: 0 }}>Aucun joueur de cet effectif ne peut occuper un poste libre.</p>
+            <p className="muted" style={{ marginTop: 4 }}>
+              {state.rerollsLeft > 0
+                ? 'Utilise un reroll pour changer d’équipe.'
+                : 'Plus de reroll — abandonne et change de défi ou de formation.'}
+            </p>
+          </div>
+        )}
 
         <SquadPanel
           club={state.currentSquad.club}
