@@ -19,6 +19,7 @@ function result(over: Partial<SeasonResult> = {}): SeasonResult {
     assisters: over.assisters ?? [rank(false)],
     keepers: over.keepers ?? [rank(false)],
     bestRated: over.bestRated ?? rank(false),
+    matchdays: [],
   }
 }
 function ctx(over: Partial<SeasonResult> = {}): EvalContext {

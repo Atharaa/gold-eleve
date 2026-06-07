@@ -35,6 +35,18 @@ export interface RankRow {
   isUser: boolean
 }
 
+export interface Match {
+  home: string
+  away: string
+  homeGoals: number
+  awayGoals: number
+}
+
+export interface Matchday {
+  round: number
+  matches: Match[]
+}
+
 export interface SeasonResult {
   table: TableRow[]
   userRow: TableRow
@@ -43,4 +55,5 @@ export interface SeasonResult {
   assisters: RankRow[]
   keepers: RankRow[]
   bestRated: RankRow
+  matchdays: Matchday[]
 }
